@@ -34,7 +34,7 @@ export const ProjectsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       } catch (error) {
         console.error("Error fetching projects:", error);
       } finally {
-        setIsLoading(false); 
+        setIsLoading(false);
       }
     };
 

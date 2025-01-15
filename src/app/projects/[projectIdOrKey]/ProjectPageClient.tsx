@@ -22,7 +22,7 @@ export default function ProjectPageClient({ params }: { params: { projectIdOrKey
         setError(`Project with key "${params.projectIdOrKey}" not found.`);
       }
     }
-  }, [projects, params.projectIdOrKey, setCurrentProject]);
+  }, [projects, params, setCurrentProject]);
 
   if (error) {
     return <div>Error: {error}</div>;

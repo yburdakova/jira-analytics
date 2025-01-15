@@ -8,12 +8,13 @@ const sections = ["General Info", "Tickets", "Counties", "Assignee", "Reporters"
 export default function ProjectPage() {
   const { projects, currentProject, setCurrentProject } = useProjects();
   const [activeSection, setActiveSection] = useState(sections[0]);
-  const [error, setError] = useState<string | null>(null);
+  const [error] = useState<string | null>(null);
+
 
   useEffect(() => {
     if (projects && projects.length > 0) {
       if (!currentProject) {
-        setCurrentProject(projects[0]); // Устанавливаем первый проект по умолчанию
+        setCurrentProject(projects[0]);
       }
     }
   }, [projects, currentProject, setCurrentProject]);
