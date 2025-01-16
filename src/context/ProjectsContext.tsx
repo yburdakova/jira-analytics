@@ -8,13 +8,13 @@ const ProjectsContext = createContext<{
   projects: z.infer<typeof JiraProjectSchema>[] | null;
   currentProject: z.infer<typeof JiraProjectSchema> | null;
   setCurrentProject: React.Dispatch<React.SetStateAction<z.infer<typeof JiraProjectSchema> | null>>;
-  isLoading: boolean; // Добавлено состояние загрузки
+  isLoading: boolean;
 } | null>(null);
 
 export const ProjectsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [projects, setProjects] = useState<z.infer<typeof JiraProjectSchema>[] | null>(null);
   const [currentProject, setCurrentProject] = useState<z.infer<typeof JiraProjectSchema> | null>(null);
-  const [isLoading, setIsLoading] = useState(true); // Изначально загрузка
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -41,8 +41,21 @@ export const ProjectsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     fetchProjects();
   }, []);
 
+  useEffect(() => {
+    if (currentProject) {
+      console.log("CurrentProject changed:", currentProject.key);
+    }
+  }, [currentProject]);
+
   return (
-    <ProjectsContext.Provider value={{ projects, currentProject, setCurrentProject, isLoading }}>
+    <ProjectsContext.Provider
+      value={{
+        projects,
+        currentProject,
+        setCurrentProject,
+        isLoading,
+      }}
+    >
       {children}
     </ProjectsContext.Provider>
   );

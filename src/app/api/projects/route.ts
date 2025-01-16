@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 export async function GET() {
-  const baseUrl = "https://courthousecomputersystems.atlassian.net/rest/api/2";
+  const baseUrl = "https://courthousecomputersystems.atlassian.net/rest/api/3";
   const email = process.env.NEXT_PUBLIC_JIRA_API_EMAIL;
   const token = process.env.NEXT_PUBLIC_JIRA_API_TOKEN;
 
