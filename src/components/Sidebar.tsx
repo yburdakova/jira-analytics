@@ -2,12 +2,13 @@
 
 import { useProjects } from "@/context/ProjectsContext";
 import Link from "next/link";
+import Loader from "./Loader";
 
 export default function Sidebar() {
   const { projects, setCurrentProject } = useProjects();
 
   if (!projects) {
-    return <div>Loading projects...</div>;
+    return <Loader note={"Loading the list of Projects..."}/>;
   }
 
   const handleProjectClick = (projectId: string) => {
