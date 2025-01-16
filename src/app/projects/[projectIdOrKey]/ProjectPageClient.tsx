@@ -40,16 +40,17 @@ export default function ProjectPageClient() {
 
 
   if (isLoading) {
-    return <div>Loading data from context...</div>;
+    return <Loader note="Loading data from context..."></Loader>;
   }
+
   if (error) {
     return <div>Error {error}</div>;
   }
 
   return (
-    <div>
-      <h1>Current project: {currentProject?.name}</h1>
-      {issuesLoading ?<Loader note={`Loading issues data of project ${currentProject?.name}...`}/>: <div className="">Total issues: {total}</div>}
+    <div className="flex flex-col gap-2">
+      <h1 className="text-2xl font-bold">Current project: {currentProject?.name}</h1>
+      {issuesLoading ?<Loader note={`Loading tickets data...`}/>: <div className="">Total tickets: {total}</div>}
     </div>
   );
 }

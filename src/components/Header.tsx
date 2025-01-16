@@ -4,9 +4,9 @@ import React from 'react';
 const Header = () => {
   return (
     <header className="p-4 border-b-2  border-gray-200">
-      <div className="container mx-auto">
+      <div>
         <Link href={`/`}>
-          <h1 className="text-xl font-bold cursor-pointer hover:underline">
+          <h1 className="text-3xl font-bold cursor-pointer hover:underline">
             Jira Analytics Dashboard
           </h1>
         </Link>
