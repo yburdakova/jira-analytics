@@ -9,18 +9,17 @@ export interface ProjectData {
   issues: JiraIssue[] | null; // Список задач
 }
 
-// Тип данных для всех проектов (Record с ключами-именами проектов)
 export type ProjectsData = Record<string, ProjectData>;
 
-// Тип контекста для работы с проектами
 export interface ProjectContextType {
-  projectsData: ProjectsData; // Все данные о проектах
-  isLoading: boolean; // Флаг загрузки
-  error: string | null; // Ошибка загрузки
-  fetchProjectData: (projectKey: string) => void; // Функция для загрузки данных проекта
+  total: number | null;
+  totalByPeriod: number | null;
+  isLoading: boolean;
+  error: string | null;
+  fetchProjectTotal: (projectKey: string) => void;
+  fetchProjectTotalbyPeriod:(projectKey: string, startDate:string, endDate:string) => void;
 }
 
-// Тип аналитической строки (пример для аналитики)
 export interface AnalyticsRow {
   name: string;
   monthlyData: Record<string, number>;
@@ -97,10 +96,10 @@ export const JiraPrioritySchema = z.object({
 });
 
 export const JiraIssueFieldsSchema = z.object({
-  customfield_10501: JiraCustomField10501Schema.optional(),
+  customfield_10501: JiraCustomField10501Schema.nullable(),
   created: z.string().optional(),
   priority: JiraPrioritySchema.optional(),
-  assignee: JiraUserSchema.optional(),
+  assignee: JiraUserSchema.nullable(),
   status: JiraStatusSchema.optional(),
   reporter: JiraUserSchema.optional(),
   project: JiraProjectInfoSchema.optional(),
@@ -117,8 +116,8 @@ export const JiraIssueSchema = z.object({
 
 export const JiraSearchResponseSchema = z.object({
   expand: z.string().optional(),
-  startAt: z.number(),
-  maxResults: z.number(),
+  startAt: z.number().optional(),
+  maxResults: z.number().optional(),
   total: z.number(),
   issues: z.array(JiraIssueSchema),
 });

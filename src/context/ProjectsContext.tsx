@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { z } from "zod";
 import { JiraProjectSchema } from "@/types/JiraProject";
-import { fetchProjects } from "@/utils/getProjects";
+import { fetchProjects } from "@/util/getProjects";
 
 const ProjectsContext = createContext<{
   projects: z.infer<typeof JiraProjectSchema>[] | null;

@@ -1,35 +1,40 @@
 "use client";
 
 import React, { createContext, useContext, useState } from "react";
-import { ProjectContextType, ProjectsData } from "@/types/JiraIssue";
-import { fetchTotalForProject } from "@/utils/getProjectTotal"; // Импортируем из утилиты
+import { ProjectContextType } from "@/types/JiraIssue";
+import { fetchTotalForProject } from "@/util/getProjectTotal"; // Импортируем из утилиты
+import { fetchTotalForPeriod } from "@/util/getProjectTotalByPeriod";
 
 const ProjectContext = createContext<ProjectContextType | null>(null);
 
 export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [projectsData, setProjectsData] = useState<ProjectsData>({});
+  const [total, setTotal] = useState<number | null>(null);
+  const [totalByPeriod, setTotalByPeriod] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchProjectData = async (projectKey: string) => {
+  const fetchProjectTotal = async (projectKey: string) => {
     setIsLoading(true);
     setError(null);
 
     try {
-      if (projectsData[projectKey]) {
-        console.log(`Data for project ${projectKey} already exists:`, projectsData[projectKey]);
-        return;
-      }
+      const fetchedTotal = await fetchTotalForProject(projectKey);
+      setTotal(fetchedTotal);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unknown error");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-      const total = await fetchTotalForProject(projectKey);
+  const fetchProjectTotalbyPeriod = async (projectKey: string, startDate:string, endDate:string) => {
+    setIsLoading(true);
+    setError(null);
 
-      setProjectsData((prev) => ({
-        ...prev,
-        [projectKey]: {
-          total,
-          issues: null,
-        },
-      }));
+    try {
+      const fetchedTotal = await fetchTotalForPeriod(projectKey, startDate, endDate);
+      console.log(`ProjectContexst: fetchProjectTotalbyPeriod got data to fetchedTotal: ${fetchedTotal}`)
+      setTotalByPeriod(fetchedTotal);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
@@ -40,10 +45,12 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
   return (
     <ProjectContext.Provider
       value={{
-        projectsData,
+        totalByPeriod,
+        total,
         isLoading,
         error,
-        fetchProjectData,
+        fetchProjectTotal,
+        fetchProjectTotalbyPeriod
       }}
     >
       {children}
