@@ -11,7 +11,7 @@ export async function GET(request: Request) {
   }
 
   const { searchParams } = new URL(request.url);
-  const projectKey = searchParams.get("key") || "CRPINDEX";
+  const projectKey = searchParams.get("project");
 
   try {
     const response = await fetch(

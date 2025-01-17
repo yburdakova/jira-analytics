@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { z } from "zod";
 import { JiraProjectSchema } from "@/types/JiraProject";
+import { fetchProjects } from "@/utils/getProjects";
 
 const ProjectsContext = createContext<{
   projects: z.infer<typeof JiraProjectSchema>[] | null;
@@ -17,20 +18,10 @@ export const ProjectsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchProjects = async () => {
+    const loadProjects = async () => {
       try {
-        const response = await fetch("/api/projects");
-        if (!response.ok) {
-          throw new Error("Failed to fetch projects");
-        }
-
-        const data = await response.json();
-        const validatedProjects = z.array(JiraProjectSchema).parse(data);
-
+        const validatedProjects = await fetchProjects();
         setProjects(validatedProjects);
-        if (validatedProjects.length > 0) {
-          setCurrentProject(validatedProjects[0]);
-        }
       } catch (error) {
         console.error("Error fetching projects:", error);
       } finally {
@@ -38,7 +29,7 @@ export const ProjectsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       }
     };
 
-    fetchProjects();
+    loadProjects();
   }, []);
 
   useEffect(() => {

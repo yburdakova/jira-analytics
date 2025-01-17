@@ -7,22 +7,20 @@ import { useEffect, useState } from "react";
 
 export default function ProjectPageClient() {
   const { currentProject } = useProjects();
-  const [ activeSection, setActiveSection] = useState<string >("")
+  const [activeSection, setActiveSection] = useState<string>("");
 
-  const {
-    total,
-    isLoadingIssues,
-    errorIssues,
-    fetchIssuesForProject,
-  } = useProject();
+  const { projectsData, isLoading, error, fetchProjectData } = useProject();
 
-  const sections = ["Tickets", "Counties", "Assignees", "Reporters"]
+  const sections = ["Total", "Tickets", "Counties", "Assignees", "Reporters"];
 
   useEffect(() => {
     if (!currentProject) return;
-    fetchIssuesForProject(currentProject.key);
+    fetchProjectData(currentProject.key);
   }, [currentProject]);
 
+  const currentProjectData = currentProject
+    ? projectsData[currentProject.key]
+    : null;
 
   const getAnalytics = (section: string) => {
     if (section) {
@@ -31,14 +29,27 @@ export default function ProjectPageClient() {
     console.log(`Fetching ${section} analytics...`);
   };
 
-  if (errorIssues) {
-    return <div>Error {errorIssues}</div>;
+  if (error) {
+    return <div>Error: {error}</div>;
   }
 
   return (
     <div className="flex flex-col gap-2">
-      <h1 className="text-2xl font-bold">Current project: {currentProject?.name}</h1>
-      {isLoadingIssues ? (<div><Loader note={`Loading tickets data...`}/>Total tickets: unknown</div>): <div className="">Total tickets: {total}</div>}
+      <h1 className="text-2xl font-bold">
+        Current project: {currentProject?.name}
+      </h1>
+      {isLoading ? (
+        <div>
+          <Loader note={`Loading tickets data...`} />
+          Total tickets: unknown
+        </div>
+      ) : currentProjectData ? (
+        <div className="">
+          Total tickets: {currentProjectData.total ?? "Unknown"}
+        </div>
+      ) : (
+        <div>No data available for the current project.</div>
+      )}
       <div className="mb-4 flex gap-4">
         {sections.map((section) => (
           <button
@@ -55,9 +66,10 @@ export default function ProjectPageClient() {
         ))}
       </div>
       <div className="py-4">
+        {activeSection === "Total" && <div>Total info content</div>}
         {activeSection === "Tickets" && <div>Tickets content</div>}
         {activeSection === "Counties" && <div>Counties content</div>}
-        {activeSection === "Assignee" && <div>Assignee content</div>}
+        {activeSection === "Assignees" && <div>Assignees content</div>}
         {activeSection === "Reporters" && <div>Reporters content</div>}
       </div>
       <div className="data-container"></div>
