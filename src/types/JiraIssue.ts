@@ -1,12 +1,10 @@
 import { z } from "zod";
 
-// Тип для одной задачи Jira
 export type JiraIssue = z.infer<typeof JiraIssueSchema>;
 
-// Тип данных для одного проекта
 export interface ProjectData {
-  total: number | null; // Общее количество задач в проекте
-  issues: JiraIssue[] | null; // Список задач
+  total: number | null;
+  issues: JiraIssue[] | null;
 }
 
 export type ProjectsData = Record<string, ProjectData>;
@@ -16,8 +14,11 @@ export interface ProjectContextType {
   totalByPeriod: number | null;
   isLoading: boolean;
   error: string | null;
+  startDate: string | null;
+  endDate: string | null;
   fetchProjectTotal: (projectKey: string) => void;
-  fetchProjectTotalbyPeriod:(projectKey: string, startDate:string, endDate:string) => void;
+  clearProjectData: () => void;
+  fetchProjectTotalbyPeriod:(projectKey: string, startDate:string | null, endDate:string | null) => void;
 }
 
 export interface AnalyticsRow {
@@ -26,8 +27,6 @@ export interface AnalyticsRow {
   total: number;
   averagePerMonth: number;
 }
-
-// Определение схем Zod для валидации данных API Jira
 
 export const JiraStatusSchema = z.object({
   self: z.string(),
@@ -81,7 +80,6 @@ export const JiraProjectInfoSchema = z.object({
     .optional(),
 });
 
-// Задаем схему для кастомного поля (Customer County)
 export const JiraCustomField10501Schema = z.object({
   self: z.string(),
   value: z.string(),

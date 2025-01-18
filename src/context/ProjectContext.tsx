@@ -12,6 +12,10 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [totalByPeriod, setTotalByPeriod] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [startDate, setStartDate] = useState<string | null>(null);
+  const [endDate, setEndDate] = useState<string | null>(null);
+
+  // const maxRequest = 100;
 
   const fetchProjectTotal = async (projectKey: string) => {
     setIsLoading(true);
@@ -27,20 +31,29 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   };
 
-  const fetchProjectTotalbyPeriod = async (projectKey: string, startDate:string, endDate:string) => {
+  const fetchProjectTotalbyPeriod = async (projectKey: string, startDate:string | null, endDate:string | null) => {
     setIsLoading(true);
     setError(null);
-
+    setStartDate(startDate)
+    setEndDate(endDate)
     try {
-      const fetchedTotal = await fetchTotalForPeriod(projectKey, startDate, endDate);
-      console.log(`ProjectContexst: fetchProjectTotalbyPeriod got data to fetchedTotal: ${fetchedTotal}`)
-      setTotalByPeriod(fetchedTotal);
+      const fetchedTotalbyPeriod = await fetchTotalForPeriod(projectKey, startDate, endDate);
+      console.log(`ProjectContexst: fetchProjectTotalbyPeriod got data to fetchedTotal: ${fetchedTotalbyPeriod}`)
+      setTotalByPeriod(fetchedTotalbyPeriod);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
       setIsLoading(false);
     }
   };
+
+  const clearProjectData = () =>{
+    console.log(`ProjectContexst: clear totalByPeriod`)
+    setTotalByPeriod(null)
+    setStartDate (null)
+    setEndDate(null)
+  }
+
 
   return (
     <ProjectContext.Provider
@@ -49,8 +62,11 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
         total,
         isLoading,
         error,
+        startDate,
+        endDate,
         fetchProjectTotal,
-        fetchProjectTotalbyPeriod
+        fetchProjectTotalbyPeriod,
+        clearProjectData
       }}
     >
       {children}

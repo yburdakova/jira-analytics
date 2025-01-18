@@ -1,7 +1,6 @@
 "use client";
 
 import Loader from "@/components/Loader";
-// import Loader from "@/components/Loader";
 import ProjectSettings from "@/components/ProjectSettings";
 import { useProject } from "@/context/ProjectContext";
 import { useProjects } from "@/context/ProjectsContext";
@@ -28,17 +27,17 @@ useEffect(() => {
 
 const handlePeriodSubmit = async (startDate: string | null, endDate: string | null) => {
   if (currentProject) {
-    if (startDate && endDate) {
-      await fetchProjectTotalbyPeriod(currentProject.key, startDate, endDate);
-      setIsAnalyzingActive(true);
-    } else {
-      await fetchProjectTotal(currentProject.key);
-    }
+    console.log(`ProjectPageClient: request of tikets by period from ${startDate} to ${endDate}`);
+    fetchProjectTotalbyPeriod(currentProject.key, startDate, endDate);
+    setIsAnalyzingActive(true);
   }
 };
 
+  const getAnalytics = () => {
+    console.log("ProjectPageClient: request of analytics by");
+  };
 
-  const getAnalytics = (section: string) => {
+  const displayAnalyticsResult = (section: string) => {
     if (section) {
       setActiveSection(section);
     }
@@ -61,7 +60,13 @@ const handlePeriodSubmit = async (startDate: string | null, endDate: string | nu
         </div>
         <div className="flex align-middle gap-8">
           <div className="content-center font-medium text-xl"> Tickets for analyze : {totalByPeriod ? totalByPeriod : "0"}</div>
-          <button disabled={!isBtnAnalyzeActive} className="px-4 disabled:cursor-not-allowed py-2 rounded bg-blue-700 text-white hover:bg-foreground hover:text-background">Analyze</button>
+          <button
+            disabled={!isBtnAnalyzeActive}
+            className="px-4 disabled:cursor-not-allowed py-2 rounded bg-blue-700 text-white hover:bg-foreground hover:text-background"
+            onClick={() => getAnalytics()}
+          >
+            Analyze
+          </button>
         </div>
       <div className="flex flex-col gap-2">
         <div className="flex gap-4">
@@ -73,7 +78,7 @@ const handlePeriodSubmit = async (startDate: string | null, endDate: string | nu
                   ? "bg-blue-500 text-white"
                   : "bg-gray-200/50 hover:bg-blue-300/50"
               }`}
-              onClick={() => getAnalytics(section)}
+              onClick={() => displayAnalyticsResult(section)}
             >
               {section}
             </button>

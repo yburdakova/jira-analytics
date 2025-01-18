@@ -14,10 +14,11 @@ const ProjectSettings: React.FC<ProjectSettingsProps> = ({ onSubmit }) => {
 
   return (
     <div className="flex flex-col justify-start">
-      <p className=" ">Select a period for analysis and click the button.</p>
+      <p>Select a period for analysis and click the button.</p>
+      <p className="mb-2">If no period is selected,
+      the system will load all tickets available in the project.</p>
       <p className="mb-2">
-        <span className="text-red-600">Warning!</span> If no period is selected,
-        the system will load all tickets available in the project. This may take
+        <span className="text-red-600">Warning!</span> Loading all tickets available in the project may take
         a long time!
       </p>
       <div className="flex gap-2 flex-col w-[25%]">

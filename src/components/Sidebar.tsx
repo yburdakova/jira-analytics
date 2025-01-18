@@ -3,9 +3,11 @@
 import { useProjects } from "@/context/ProjectsContext";
 import Link from "next/link";
 import Loader from "./Loader";
+import { useProject } from "@/context/ProjectContext";
 
 export default function Sidebar() {
   const { projects, setCurrentProject } = useProjects();
+  const { clearProjectData } = useProject();
 
   if (!projects) {
     return <Loader note={"Loading the list of Projects..."}/>;
@@ -15,6 +17,7 @@ export default function Sidebar() {
     const selectedProject = projects.find((p) => p.key === projectId);
     if (selectedProject) {
       setCurrentProject(selectedProject);
+      clearProjectData();
     }
   };
 
