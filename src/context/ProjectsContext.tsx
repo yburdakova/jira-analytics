@@ -34,7 +34,6 @@ export const ProjectsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   useEffect(() => {
     if (currentProject) {
-      console.log("CurrentProject changed:", currentProject.key);
     }
   }, [currentProject]);
 

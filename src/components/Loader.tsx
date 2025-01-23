@@ -4,7 +4,7 @@ import { LoaderProps } from '@/types/Loader'
 
 const Loader = ({ note }: LoaderProps) => {
   return (
-    <div className="fixed inset-0 flex flex-col gap-3 items-center justify-center bg-background/10 z-50">
+    <div className="fixed inset-0 flex flex-col gap-3 items-center justify-center bg-background z-50">
       <div className=""> {note} </div>
       <Image
         src="/logo_loader.gif"

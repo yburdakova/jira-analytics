@@ -10,7 +10,7 @@ export default function ProjectPageClient() {
   const sections = ["Settings", "Tickets", "Counties", "Assignees", "Reporters"];
 
   const { currentProject } = useProjects();
-  const { total, error, isLoading, totalByPeriod, fetchProjectTotal, fetchProjectTotalbyPeriod } =useProject();
+  const { total, error, isLoading, totalByPeriod, issues, fetchProjectTotal, fetchProjectTotalbyPeriod, fetchIssuesForAnalyze } =useProject();
   const [activeSection, setActiveSection] = useState<string>("Settings");
   const [isBtnAnalyzeActive, setIsAnalyzingActive] = useState<boolean>(false);
 
@@ -21,27 +21,23 @@ useEffect(() => {
     }
 },[currentProject])
 
-useEffect(() => {
-  console.log("Total by period updated:", totalByPeriod);
-}, [totalByPeriod]);
-
 const handlePeriodSubmit = async (startDate: string | null, endDate: string | null) => {
   if (currentProject) {
-    console.log(`ProjectPageClient: request of tikets by period from ${startDate} to ${endDate}`);
     fetchProjectTotalbyPeriod(currentProject.key, startDate, endDate);
     setIsAnalyzingActive(true);
   }
 };
 
   const getAnalytics = () => {
-    console.log("ProjectPageClient: request of analytics by");
+    if (currentProject) {
+      fetchIssuesForAnalyze(currentProject.key)
+    }
   };
 
   const displayAnalyticsResult = (section: string) => {
     if (section) {
       setActiveSection(section);
     }
-    console.log(`Fetching ${section} analytics...`);
   };
 
 
@@ -94,7 +90,22 @@ const handlePeriodSubmit = async (startDate: string | null, endDate: string | nu
         {activeSection === "Assignees" && <div>Assignees content</div>}
         {activeSection === "Reporters" && <div>Reporters content</div>}
       </div>
-      <div className="data-container"></div>
+      <div className="data-container">
+      <div>
+      {issues ? (
+        <div>
+          <h2>Analyzed Tickets:</h2>
+          <ul>
+            {issues.map((issue) => (
+              <li key={`issue-${issue.id}`}>{issue.key}: {issue.fields.summary}</li>
+            ))}
+          </ul>
+        </div>
+      ) : (
+        <p>No tickets loaded for analysis.</p>
+      )}
+    </div>
+      </div>
     </div>
   );
 }

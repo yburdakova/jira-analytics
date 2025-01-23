@@ -1,6 +1,6 @@
 export const fetchTotalForProject = async (projectKey: string): Promise<number> => {
   try {
-    const response = await fetch(`/api/issues?project=${projectKey}`);
+    const response = await fetch(`/api/issues?project=${projectKey}&startAt=0&maxResults=50`);
     if (!response.ok) {
       throw new Error(`Failed to fetch total for project: ${projectKey}`);
     }

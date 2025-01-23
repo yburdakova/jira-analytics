@@ -1,9 +1,11 @@
 "use client";
 
 import React, { createContext, useContext, useState } from "react";
-import { ProjectContextType } from "@/types/JiraIssue";
+import { JiraIssue, ProjectContextType } from "@/types/JiraIssue";
 import { fetchTotalForProject } from "@/util/getProjectTotal"; // Импортируем из утилиты
 import { fetchTotalForPeriod } from "@/util/getProjectTotalByPeriod";
+import { fetchDatedIssuesForProject } from "@/util/getDatedProjectIssues";
+import { fetchAllIssuesForProject } from "@/util/getAllProjectIssues";
 
 const ProjectContext = createContext<ProjectContextType | null>(null);
 
@@ -14,8 +16,7 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [error, setError] = useState<string | null>(null);
   const [startDate, setStartDate] = useState<string | null>(null);
   const [endDate, setEndDate] = useState<string | null>(null);
-
-  // const maxRequest = 100;
+  const [issues, setIssues] = useState<JiraIssue[] | null>(null);
 
   const fetchProjectTotal = async (projectKey: string) => {
     setIsLoading(true);
@@ -38,7 +39,6 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setEndDate(endDate)
     try {
       const fetchedTotalbyPeriod = await fetchTotalForPeriod(projectKey, startDate, endDate);
-      console.log(`ProjectContexst: fetchProjectTotalbyPeriod got data to fetchedTotal: ${fetchedTotalbyPeriod}`)
       setTotalByPeriod(fetchedTotalbyPeriod);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
@@ -47,11 +47,40 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   };
 
+  const fetchIssuesForAnalyze = async (projectKey: string) =>{
+    setIsLoading(true);
+    setError(null);
+    console.log(`startDate: ${startDate}, endDate: ${endDate}`)
+    try {
+      if (startDate === null || endDate === null) {
+        console.log("REQUEST DATA WITHOUT DATES!!!!!");
+        const fetchedIssues = await fetchAllIssuesForProject(projectKey);
+        console.log(`Fetched ${fetchedIssues.length} issues for full project.`);
+        setIssues(fetchedIssues);
+      } else {
+
+        console.log("REQUEST DATA WITH DATES!!!!!");
+        const fetchedDatedIssues = await fetchDatedIssuesForProject(projectKey, startDate, endDate);
+        console.log(
+          `Fetched ${fetchedDatedIssues.length} issues for project ${projectKey} within the specified period.`
+        );
+        setIssues(fetchedDatedIssues);
+      }
+    } catch (err) {
+      console.error("Error fetching issues:", err);
+      setError(err instanceof Error ? err.message : "Unknown error");
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+
   const clearProjectData = () =>{
     console.log(`ProjectContexst: clear totalByPeriod`)
     setTotalByPeriod(null)
     setStartDate (null)
     setEndDate(null)
+    setIssues(null)
   }
 
 
@@ -64,9 +93,11 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
         error,
         startDate,
         endDate,
+        issues,
         fetchProjectTotal,
         fetchProjectTotalbyPeriod,
-        clearProjectData
+        clearProjectData,
+        fetchIssuesForAnalyze
       }}
     >
       {children}

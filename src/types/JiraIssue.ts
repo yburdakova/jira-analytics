@@ -16,8 +16,10 @@ export interface ProjectContextType {
   error: string | null;
   startDate: string | null;
   endDate: string | null;
+  issues: JiraIssue[] | null;
   fetchProjectTotal: (projectKey: string) => void;
   clearProjectData: () => void;
+  fetchIssuesForAnalyze:  (projectKey: string) => void;
   fetchProjectTotalbyPeriod:(projectKey: string, startDate:string | null, endDate:string | null) => void;
 }
 

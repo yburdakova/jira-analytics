@@ -12,18 +12,31 @@ export async function GET(request: Request) {
 
   const { searchParams } = new URL(request.url);
   const projectKey = searchParams.get("project");
+  const startDate = searchParams.get("startDate");
+  const endDate = searchParams.get("endDate");
+  const startAt = searchParams.get("startAt") || "0";
+  const maxResults = searchParams.get("maxResults") || "50";
+
+  if (!projectKey) {
+    return NextResponse.json({ error: "Project key is required" }, { status: 400 });
+  }
 
   try {
-    const response = await fetch(
-      `${baseUrl}/search?jql=project=${projectKey}`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Basic ${Buffer.from(`${email}:${token}`).toString("base64")}`,
-          Accept: "application/json",
-        },
-      }
-    );
+    let jql = `project=${projectKey}`;
+    if (startDate && endDate) {
+      jql += ` AND created >= "${startDate}" AND created <= "${endDate}"`;
+    }
+
+    const url = `${baseUrl}/search?jql=${encodeURIComponent(jql)}&startAt=${startAt}&maxResults=${maxResults}`;
+    console.log(`Requesting Jira API: ${url}`);
+
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        Authorization: `Basic ${Buffer.from(`${email}:${token}`).toString("base64")}`,
+        Accept: "application/json",
+      },
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
