@@ -50,7 +50,10 @@ const handlePeriodSubmit = async (startDate: string | null, endDate: string | nu
   const displayAnalyticsResult = (section: string) => {
     if (section) {
       setActiveSection(section)
-      analyzeIssues(section as "Tickets" | "Counties" | "Assignees" | "Reporters");
+      if (section !== "Settings") {
+        analyzeIssues(section as "Tickets" | "Counties" | "Assignees" | "Reporters");
+      }
+
     }
     console.log(analyzedStats)
   };
