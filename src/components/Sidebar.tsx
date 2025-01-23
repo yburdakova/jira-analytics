@@ -22,7 +22,7 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="w-64 p-4 border-r border-gray-200">
+    <aside className="min-w-64 max-w-64 p-4 border-r border-gray-200">
       <h2 className="text-lg font-bold mb-4">Projects</h2>
       <ul>
         {projects.map((project) => (

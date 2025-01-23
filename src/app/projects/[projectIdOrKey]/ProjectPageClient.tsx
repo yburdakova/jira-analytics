@@ -2,6 +2,7 @@
 
 import Loader from "@/components/Loader";
 import ProjectSettings from "@/components/ProjectSettings";
+import ScrollableTable from "@/components/statTable";
 import { useProject } from "@/context/ProjectContext";
 import { useProjects } from "@/context/ProjectsContext";
 import { useEffect, useState } from "react";
@@ -10,9 +11,21 @@ export default function ProjectPageClient() {
   const sections = ["Settings", "Tickets", "Counties", "Assignees", "Reporters"];
 
   const { currentProject } = useProjects();
-  const { total, error, isLoading, totalByPeriod, issues, fetchProjectTotal, fetchProjectTotalbyPeriod, fetchIssuesForAnalyze } =useProject();
+  const {
+    total,
+    error,
+    isLoading,
+    totalByPeriod,
+    analyzedStats,
+    fetchProjectTotal,
+    fetchProjectTotalbyPeriod,
+    fetchIssuesForAnalyze,
+    analyzeIssues
+  } =useProject();
   const [activeSection, setActiveSection] = useState<string>("Settings");
   const [isBtnAnalyzeActive, setIsAnalyzingActive] = useState<boolean>(false);
+
+  const activeStats = analyzedStats.find((stat) => stat.category === activeSection);
 
 useEffect(() => {
     setIsAnalyzingActive(false);
@@ -36,8 +49,10 @@ const handlePeriodSubmit = async (startDate: string | null, endDate: string | nu
 
   const displayAnalyticsResult = (section: string) => {
     if (section) {
-      setActiveSection(section);
+      setActiveSection(section)
+      analyzeIssues(section as "Tickets" | "Counties" | "Assignees" | "Reporters");
     }
+    console.log(analyzedStats)
   };
 
 
@@ -81,30 +96,13 @@ const handlePeriodSubmit = async (startDate: string | null, endDate: string | nu
           ))}
           </div>
       </div>
-      <div className="py-4">
-      {activeSection === "Settings" && (
-          <ProjectSettings onSubmit={handlePeriodSubmit} />
-        )}
-        {activeSection === "Tickets" && <div>Tickets content</div>}
-        {activeSection === "Counties" && <div>Counties content</div>}
-        {activeSection === "Assignees" && <div>Assignees content</div>}
-        {activeSection === "Reporters" && <div>Reporters content</div>}
-      </div>
       <div className="data-container">
-      <div>
-      {issues ? (
-        <div>
-          <h2>Analyzed Tickets:</h2>
-          <ul>
-            {issues.map((issue) => (
-              <li key={`issue-${issue.id}`}>{issue.key}: {issue.fields.summary}</li>
-            ))}
-          </ul>
-        </div>
-      ) : (
-        <p>No tickets loaded for analysis.</p>
-      )}
-    </div>
+
+        {activeSection === "Settings" && <ProjectSettings onSubmit={handlePeriodSubmit} />}
+        {activeSection !== "Settings" && activeStats && (
+            <ScrollableTable data={activeStats.tableData} months={activeStats.months} />
+        )}
+
       </div>
     </div>
   );

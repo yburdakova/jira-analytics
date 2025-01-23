@@ -17,11 +17,18 @@ export interface ProjectContextType {
   startDate: string | null;
   endDate: string | null;
   issues: JiraIssue[] | null;
-  fetchProjectTotal: (projectKey: string) => void;
+  analyzedStats: { category: string; tableData: TableRow[]; months: string[] }[];
+  fetchProjectTotal: (projectKey: string) => Promise<void>;
+  fetchProjectTotalbyPeriod: (
+    projectKey: string,
+    startDate: string | null,
+    endDate: string | null
+  ) => Promise<void>;
+  fetchIssuesForAnalyze: (projectKey: string) => Promise<void>;
+  analyzeIssues: (category: "Tickets" | "Counties" | "Assignees" | "Reporters") => void;
   clearProjectData: () => void;
-  fetchIssuesForAnalyze:  (projectKey: string) => void;
-  fetchProjectTotalbyPeriod:(projectKey: string, startDate:string | null, endDate:string | null) => void;
 }
+
 
 export interface AnalyticsRow {
   name: string;
@@ -121,3 +128,15 @@ export const JiraSearchResponseSchema = z.object({
   total: z.number(),
   issues: z.array(JiraIssueSchema),
 });
+
+export type IssueStat = {
+  date: string;
+  categories: Record<string, number>;
+};
+
+export type TableRow = {
+  name: string;
+  total: number;
+  averagePerMonth: number;
+  monthlyData: Record<string, number>;
+};

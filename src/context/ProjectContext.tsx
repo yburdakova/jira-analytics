@@ -1,11 +1,12 @@
 "use client";
 
 import React, { createContext, useContext, useState } from "react";
-import { JiraIssue, ProjectContextType } from "@/types/JiraIssue";
+import { JiraIssue, ProjectContextType, TableRow } from "@/types/JiraIssue";
 import { fetchTotalForProject } from "@/util/getProjectTotal"; // Импортируем из утилиты
 import { fetchTotalForPeriod } from "@/util/getProjectTotalByPeriod";
 import { fetchDatedIssuesForProject } from "@/util/getDatedProjectIssues";
 import { fetchAllIssuesForProject } from "@/util/getAllProjectIssues";
+import { calculateIssuesStats } from "@/util/getIssuesStats";
 
 const ProjectContext = createContext<ProjectContextType | null>(null);
 
@@ -17,6 +18,8 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [startDate, setStartDate] = useState<string | null>(null);
   const [endDate, setEndDate] = useState<string | null>(null);
   const [issues, setIssues] = useState<JiraIssue[] | null>(null);
+  const [analyzedStats, setAnalyzedStats] = useState<{ category: string; tableData: TableRow[]; months: string[] }[]>([]);
+
 
   const fetchProjectTotal = async (projectKey: string) => {
     setIsLoading(true);
@@ -53,17 +56,10 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
     console.log(`startDate: ${startDate}, endDate: ${endDate}`)
     try {
       if (startDate === null || endDate === null) {
-        console.log("REQUEST DATA WITHOUT DATES!!!!!");
         const fetchedIssues = await fetchAllIssuesForProject(projectKey);
-        console.log(`Fetched ${fetchedIssues.length} issues for full project.`);
         setIssues(fetchedIssues);
       } else {
-
-        console.log("REQUEST DATA WITH DATES!!!!!");
         const fetchedDatedIssues = await fetchDatedIssuesForProject(projectKey, startDate, endDate);
-        console.log(
-          `Fetched ${fetchedDatedIssues.length} issues for project ${projectKey} within the specified period.`
-        );
         setIssues(fetchedDatedIssues);
       }
     } catch (err) {
@@ -74,6 +70,24 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   }
 
+  const analyzeIssues = (category: "Tickets" | "Counties" | "Assignees" | "Reporters") => {
+    const existingStat = analyzedStats.find((stat) => stat.category === category);
+    if (existingStat) {
+      console.log(`Stats for category "${category}" already exist.`);
+      return;
+    }
+
+    if (issues) {
+      const { stats: tableData, months } = calculateIssuesStats(issues, category);
+      setAnalyzedStats((prevStats) => [
+        ...prevStats,
+        { category, tableData, months },
+      ]);
+      console.log(`Stats for category "${category}" calculated and saved.`);
+    } else {
+      console.warn("No issues available for analysis.");
+    }
+  };
 
   const clearProjectData = () =>{
     console.log(`ProjectContexst: clear totalByPeriod`)
@@ -81,24 +95,27 @@ export const ProjectProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setStartDate (null)
     setEndDate(null)
     setIssues(null)
+    setAnalyzedStats([])
   }
 
 
   return (
     <ProjectContext.Provider
-      value={{
-        totalByPeriod,
-        total,
-        isLoading,
-        error,
-        startDate,
-        endDate,
-        issues,
-        fetchProjectTotal,
-        fetchProjectTotalbyPeriod,
-        clearProjectData,
-        fetchIssuesForAnalyze
-      }}
+    value={{
+      totalByPeriod,
+      total,
+      isLoading,
+      error,
+      startDate,
+      endDate,
+      issues,
+      analyzedStats,
+      fetchProjectTotal,
+      fetchProjectTotalbyPeriod,
+      fetchIssuesForAnalyze,
+      analyzeIssues,
+      clearProjectData,
+    }}
     >
       {children}
     </ProjectContext.Provider>
