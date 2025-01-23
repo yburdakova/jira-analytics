@@ -57,9 +57,9 @@ export const calculateIssuesStats = (
     const [monthB, yearB] = b.split("-").map(Number);
   
     if (yearA === yearB) {
-      return monthA - monthB;
+      return monthB - monthA;
     }
-    return yearA - yearB;
+    return yearB - yearA;
   });
 
   stats.forEach((row) => {

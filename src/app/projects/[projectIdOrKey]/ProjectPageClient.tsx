@@ -2,7 +2,7 @@
 
 import Loader from "@/components/Loader";
 import ProjectSettings from "@/components/ProjectSettings";
-import ScrollableTable from "@/components/statTable";
+import ScrollableTable from "@/components/ScrollableTable";
 import { useProject } from "@/context/ProjectContext";
 import { useProjects } from "@/context/ProjectsContext";
 import { useEffect, useState } from "react";
